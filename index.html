@@ -7,7 +7,7 @@
 
     <meta property="og:title" content="🎂祝妳生日快樂">
     <meta property="og:description" content="🎂祝妳生日快樂">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1000&auto=format&fit=crop">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1516331138075-f3adc1e149cd?q=80&w=1000&auto=format&fit=crop">
     <meta property="og:type" content="website">
     <style>
         /* 基本背景與排版設定 */
@@ -15,8 +15,9 @@
             margin: 0;
             padding: 0;
             background: linear-gradient(to bottom, #fff0f5, #ffe4e1);
-            font-family: sans-serif;
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
             overflow-x: hidden; /* 防止橫向捲動 */
+            transition: background 1s ease;
         }
 
         /* 讀取畫面動畫設計 */
@@ -26,6 +27,7 @@
             height: 100vh;
             background: linear-gradient(to bottom, #fff0f5, #ffe4e1);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10000;
@@ -33,6 +35,16 @@
             color: #555;
             transition: opacity 0.5s ease;
         }
+        #loading .spinner {
+            border: 4px solid rgba(255, 105, 180, 0.1);
+            border-left-color: #ff69b4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* 主要內容區域（一開始先隱藏） */
         #main-content {
@@ -42,6 +54,8 @@
             padding: 20px;
             max-width: 600px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         /* 漂浮圖案的動畫 */
@@ -55,7 +69,7 @@
         .floating-emoji {
             position: fixed;
             top: 0; 
-            z-index: -1; /* 放在背景 */
+            z-index: 0; /* 放在背景 */
             pointer-events: none;
             animation-name: floatUp;
             animation-iteration-count: infinite;
@@ -72,12 +86,14 @@
             margin-top: 20px;
             width: 100%;
             box-sizing: border-box;
+            backdrop-filter: blur(5px);
         }
 
         .birthday-text {
             font-size: 1.05rem; 
             color: #555; 
             line-height: 1.8; 
+            letter-spacing: 0.5px;
         }
 
         /* 並排 GIF 的容器 */
@@ -93,6 +109,89 @@
             width: 48%; /* 讓兩張圖各佔約一半 */
             border-radius: 10px;
             object-fit: cover;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* 👇 【新增】：伏筆按鍵樣式 */
+        #secret-button-container {
+            margin-top: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+            width: 100%;
+            opacity: 0; /* 初始隱藏 */
+            animation: fadeIn 1s ease 3s forwards; /* 延遲 3 秒後淡入 */
+        }
+        @keyframes fadeIn { 100% { opacity: 1; } }
+
+        .secret-btn {
+            background: none;
+            border: 1px dashed #ffb6c1;
+            color: #ff69b4;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+        .secret-btn:hover {
+            background-color: rgba(255, 182, 193, 0.2);
+            border-style: solid;
+            transform: scale(1.05);
+        }
+
+        /* 👇 【新增】：秘密信紙頁面樣式（隱藏） */
+        #secret-content {
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            width: 100vw;
+            height: 100vh;
+            box-sizing: border-box;
+            background: #ffffff; /* 純白背景 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 5000;
+            overflow-y: auto; /* 字多時可滑動 */
+        }
+        
+        .letter-paper {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        /* 信紙格紋效果 */
+        .letter-paper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(90deg, rgba(200, 200, 200, 0.15) 1px, transparent 1px),
+                              linear-gradient(rgba(200, 200, 200, 0.15) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+        }
+
+        .letter-text {
+            font-size: 1.1rem;
+            color: #444;
+            line-height: 2;
+            letter-spacing: 1.5px;
+            text-align: justify; /* 文字兩端對齊 */
+            word-wrap: break-word; /* 🌟 確保在手機上絕對不會跑版，自動換行 */
+        }
+
+        .letter-footer {
+            margin-top: 50px;
+            font-size: 0.9rem;
+            color: #888;
+            text-align: center;
+            font-style: italic;
         }
 
         /* 手機排版優化 */
@@ -103,12 +202,26 @@
             .message-card {
                 padding: 20px 10px; 
             }
+            .secret-btn {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
+            #secret-content {
+                padding: 30px 15px;
+            }
+            .letter-text {
+                font-size: 0.95rem;
+                line-height: 1.9;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div id="loading">正在為妳準備驚喜，請稍等喔...</div>
+    <div id="loading">
+        <div class="spinner"></div>
+        <div id="loading-text">正在為妳準備驚喜，請稍等喔...</div>
+    </div>
 
     <div id="main-content">
         <div class="message-card">
@@ -130,17 +243,75 @@
             <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdjduZjBva3phdDJmamFsbDVydzl1eG11a3oydG5zZ2hnc2xtY2tmciZlcD12MV9naWZzX3NlYXJjaCZjdD1n/IFjSbBHETzzr6GJdwW/giphy.gif" alt="GIF 1">
             <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExenBpcG43NmJ3YjlkZm9vaTd5bDh3dHB1ZnJmc25zc2ZiYnpmdHh1ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/AgO9VR2a9KW1MSP73I/giphy.gif" alt="GIF 2">
         </div>
+        
+        <div id="secret-button-container">
+            <button class="secret-btn" onclick="showSecret()">🍂 埋的伏筆被妳發現了</button>
+        </div>
+    </div>
+
+    <div id="secret-content">
+        <div class="letter-paper">
+            <div class="letter-text">
+李芯貝，好久沒這樣那麼正式和好好的能跟妳<br>
+說我心裡的話了，我對妳呢依舊是喜歡，只不<br>
+過從明戀變成了呆戀。我說我還喜歡妳的話妳<br>
+肯定會覺得很奇怪的，但是我想說呢，無論在<br>
+分手後在我談戀愛那陣子跑去找妳耍白痴了一<br>
+下我真的真的還是很喜歡妳的，我在這一大段<br>
+時間我想了很多學了很多，我把我不會的英文<br>
+面對未來要應對的理財.投資或者是什麼的問題<br>
+我全都學了一遍，也一直在往外面發展去讓自<br>
+己眼界更大，我想要配得上妳，我封鎖妳的時<br>
+候呢我還是有偷觀察一下妳的腳步，沒有落下<br>
+我總害怕呢妳太快了，或者是遇到喜歡的人了<br>
+我就沒機會去追回來妳了，說真的，我對好久<br>
+之前甚至連我跟妳發生了什麼事情都不記得，
+但是吖，我一直真的真的很堅信，我就算沒跟<br>
+妳見過面，沒真的看過妳怎樣，很了解妳到什<br>
+麼地步，我就是一定會喜歡妳，我知道妳的沒<br>
+自信知道妳的害怕，妳的不好意思，就算妳一<br>
+直都強裝沒有這些事情，可我一直都知道，所<br>
+以我也才說，在台北或者是在哪呢，有什麼事<br>
+情可以跟我說也可以找我幫忙，不開心了也可<br>
+以跟我講，我有什麼事情是不能說的呢，我也<br>
+不知道，我可以很當作一個機器人在那邊聽妳<br>
+所說也不讓妳難堪，好好笑，妳說的對，我對<br>
+妳說的我是個大忙人這句話印象好深，但是我<br>
+現在開始呢，一直在為未來計畫，每晚一年跟<br>
+妳發展，我把計劃就在稍微往前一點，照這樣<br>
+子，一直在想著我什麼時候能可以追回來有那<br>
+契機有這個機會讓妳覺得跟我在一起是會有<br>
+未來且安穩的呢？講到這裡，我也有些許的自<br>
+作多情了，搞不好妳早就覺得我長那麼醜那麼<br>
+愚蠢那麼白目的一個人到底在自作多情什麼呢<br>
+妳說對吧，哎呀，如果說呢，妳真的回味了<br>
+這個網站回來看了，妳可以裝作不知道也可以<br>
+拿來笑我，哎我啥都看得開的，我現在真的很<br>
+隨意自然的，但是呢，妳願意給我這個機會的<br>
+話，我希望妳可以給我一個訊號或是跟我說，<br>
+我可以再把更多的事情和東西跟妳說，讓妳好<br>
+考慮，這個事情不會過期，因為我本來就沒<br>
+打算再談了，妳一直都是我這那麽多年來唯一<br>
+一個說的例外，我會一直等等等等等等到妳真<br>
+的很幸福很自信也不會再當愛哭包。
+            </div>
+            
+            <div class="letter-footer">
+                謝謝妳回來看吖我的初戀，小大人。<br><br>
+                （妳用手機看才不會格式跑掉喔！）
+            </div>
+        </div>
     </div>
 
     <script>
-        // 1. 產生 25 個漂浮符號特效
-        const emojis = ['💖', '🎆', '🌸', '✨', '💕', '🎂'];
-        for (let i = 0; i < 25; i++) {
+        // 1. 產生 漂浮符號特效（增加到 30 個，並加入星星與楓葉）
+        const emojis = ['💖', '🎆', '🌸', '✨', '💕', '🎂', '🌟', '🍂'];
+        for (let i = 0; i < 30; i++) {
             let emoji = emojis[Math.floor(Math.random() * emojis.length)];
             let left = Math.random() * 100;
             let duration = Math.random() * 15 + 15; // 15 到 30 秒
             let delay = Math.random() * -30; // 讓一開始畫面上就已經有漂浮物
-            let size = Math.random() * 1 + 1; // 1 到 2 rem
+                        let size = Math.random() * 1 + 0.8; // 0.8 到 1.8 rem
 
             let div = document.createElement('div');
             div.className = 'floating-emoji';
@@ -152,20 +323,49 @@
             document.body.appendChild(div);
         }
 
-        // 2. 模擬 Streamlit 的 spinner，等待 2.5 秒後顯示卡片
+        // 2. 模擬讀取畫面，等待 2.5 秒後顯示卡片
         setTimeout(() => {
+            hideLoadingAndShowContent('main-content');
+        }, 2500);
+
+        // 👇 【新增】：顯示秘密內容的邏輯
+        function showSecret() {
+            // 先顯示讀取畫面，模擬「開啟心扉」的過程
             const loading = document.getElementById('loading');
-            const mainContent = document.getElementById('main-content');
-            
-            // 讓讀取文字淡出
+            const loadingText = document.getElementById('loading-text');
+            loadingText.innerText = '正在開啟埋藏的伏筆...';
+            loading.style.display = 'flex';
+            loading.style.opacity = '1';
+
+            setTimeout(() => {
+                // 隱藏祝福頁面，顯示秘密信紙頁面
+                document.getElementById('main-content').style.display = 'none';
+                document.getElementById('secret-content').style.display = 'flex';
+                // 改變背景色為信紙的純白
+                document.body.style.background = '#ffffff';
+                
+                // 隱藏所有漂浮符號
+                const floatingEmojis = document.querySelectorAll('.floating-emoji');
+                floatingEmojis.forEach(el => el.style.display = 'none');
+
+                // 讀取畫面淡出
+                loading.style.opacity = '0';
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                }, 500);
+            }, 2500); // 模擬 2.5 秒讀取
+        }
+
+        // 通用：隱藏讀取畫面並顯示指定內容
+        function hideLoadingAndShowContent(contentId) {
+            const loading = document.getElementById('loading');
+            const content = document.getElementById(contentId);
             loading.style.opacity = '0';
-            
             setTimeout(() => {
                 loading.style.display = 'none';
-                mainContent.style.display = 'flex'; // 顯示主角
-            }, 500); // 等待淡出動畫結束
-            
-        }, 2500);
+                content.style.display = 'flex';
+            }, 500);
+        }
     </script>
 </body>
 </html>
